@@ -1,0 +1,5 @@
+# Optional: OCR support for scanned PDFs
+# Install with: pip install -r requirements-optional.txt
+# Requires Tesseract installed on system: https://github.com/tesseract-ocr/tesseract
+PyMuPDF>=1.23.0
+pytesseract==0.3.10
