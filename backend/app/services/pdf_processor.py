@@ -21,13 +21,6 @@ try:
 except ImportError:
     TESSERACT_AVAILABLE = False
 
-# Common domain columns - configurable
-DEFAULT_DOMAIN_COLUMNS = [
-    "document_title", "date", "author", "subject", "company_name",
-    "invoice_number", "amount", "description", "keywords",
-    "section_1", "section_2", "section_3", "raw_text_preview"
-]
-
 
 def extract_text_pdfplumber(pdf_path: Path) -> Tuple[str, List[Dict]]:
     """Extract text and tables using pdfplumber (best for digital PDFs)."""

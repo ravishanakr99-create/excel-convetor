@@ -7,30 +7,16 @@ from openpyxl import load_workbook
 from openpyxl.styles import Font, Alignment, PatternFill
 from openpyxl.utils.dataframe import dataframe_to_rows
 
-from app.services.pdf_processor import DEFAULT_DOMAIN_COLUMNS
-
 logger = logging.getLogger(__name__)
-
-# Standard fields for layout-aware extraction
-STANDARD_FIELDS = [
-    "name", "id_number", "phone", "address", "dob", "email"
-]
 
 
 def discover_fields(results: List[Dict[str, Any]]) -> List[str]:
-    """Dynamically discover all fields from extraction results."""
+    """Dynamically discover all fields from extraction results - pure alphabetical."""
     fields: Set[str] = set()
     for r in results:
         fields.update(r.get("fields", {}).keys())
     
-    # Prioritize standard fields first, then alphabetical
-    ordered = []
-    for f in STANDARD_FIELDS:
-        if f in fields:
-            ordered.append(f)
-            fields.discard(f)
-    ordered.extend(sorted(fields))
-    return ordered
+    return sorted(fields)
 
 
 def build_dataframe(
@@ -43,27 +29,14 @@ def build_dataframe(
     
     rows = []
     for r in results:
-        row = {
-            "file_name": r.get("file_name", ""),
-            "status": "error" if r.get("error") else "success",
-            "is_scanned": r.get("is_scanned", False),
-            "template_id": r.get("template_id", "")
-        }
-        
-        # Add error message if present
-        if r.get("error"):
-            row["error_message"] = r.get("error")
-        else:
-            row["error_message"] = ""
+        # Only file_name and extracted fields - no extra metadata
+        row = {"file_name": r.get("file_name", "")}
         
         fields = r.get("fields", {})
-        scores = r.get("confidence_scores", {})
         
         for col in cols:
             val = fields.get(col)
             row[col] = val if val is not None else ""
-            score = scores.get(col, 0)
-            row[f"{col}_confidence"] = round(score, 2) if isinstance(score, (int, float)) else 0.0
         
         rows.append(row)
     
@@ -74,8 +47,8 @@ def build_dataframe(
 def generate_excel(
     results: List[Dict[str, Any]],
     domain_columns: Optional[List[str]] = None,
-    include_confidence: bool = True,
-    include_summary: bool = True
+    include_confidence: bool = False,
+    include_summary: bool = False
 ) -> bytes:
     """
     Generate Excel file with extracted data.

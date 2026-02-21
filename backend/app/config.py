@@ -17,10 +17,14 @@ class Settings(BaseSettings):
     openai_api_key: str = ""  # Set OPENAI_API_KEY in .env for AI extraction
     upload_dir: str = "./uploads"
     output_dir: str = "./outputs"
-    storage_type: str = "local"
+    storage_type: str = "local"  # "local" or "supabase"
     database_url: str = "sqlite:///./pdf_extractor.db"
     max_upload_files: int = 500
     max_file_size_mb: int = 50
+    
+    # Supabase configuration (optional - for cloud storage)
+    supabase_url: str = ""  # Your Supabase project URL
+    supabase_key: str = ""  # Your Supabase service role key
     
     class Config:
         env_file = ".env"
